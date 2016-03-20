@@ -1,0 +1,13 @@
+{
+  "manifest_version": 2,
+  "name": "Java SE docs search",
+  "description": "Provides convenient shortcut to search through Oracle Java SE 8 documentation",
+  "version": "0.1.0",
+  "icons": {
+    "128": "icons/128.png"
+  },
+  "omnibox": { "keyword" : "java" },
+  "background": {
+    "scripts": ["background.js"]
+  }
+}
