@@ -1,0 +1,13 @@
+{
+  "manifest_version": 2,
+  "name": "Java SE docs search",
+  "description": "A Chrome extension that adds 'java' omnibox command to search through Java SE documentation",
+  "version": "0.1.0",
+  "icons": {
+    "128": "icons/128.png"
+  },
+  "omnibox": { "keyword" : "java" },
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

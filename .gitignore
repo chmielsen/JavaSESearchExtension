@@ -1,0 +1,4 @@
+*.pyc
+crawler/classes/*
+crawler/*.js
+
