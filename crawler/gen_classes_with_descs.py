@@ -78,7 +78,8 @@ def parse_attr_files():
             if href[-1] == '-':
                 if not contains_attr(methods, attrStrip):
                     # is a method
-                    methods.append((attrStrip, href))
+                    fullname = get_name_from_link(href)
+                    methods.append((fullname, href))
             elif not contains_attr(fields, attrStrip):
                 if not is_internal_class(classname, attrStrip):
                     fields.append((attrStrip, href))
@@ -101,6 +102,29 @@ def contains_attr(list_of_pairs, attr):
 def is_internal_class(classname, attr):
     simple_name = classname.split('.')[-1]
     return simple_name in attr
+
+def reverse_class_dict(classesDict):
+     # attrName => {'classname" : String, 'link' : String}
+    attrList = []
+    for (classname, attrs) in classesDict.iteritems():
+        for m in attrs['methods']:
+            # m[0] - method name, m[1] - link
+            attrList.append({'fullname': get_name_from_link(m[1]), 'classname' : classname, 'link' : m[1], 'type' : 'method'})
+        for f in attrs['fields']:
+            # f[0] - field name, f[1] - link
+            attrList.append({'fullname': f[0], 'classname' : classname, 'link' : f[1], 'type' : 'field'})
+
+    return attrList
+
+def get_name_from_link(link):
+    nameAndArgs = filter(None, link.split('#')[1].split('-'))
+    # take classname from fully qualifed name
+    args = map(lambda qArg: qArg.rsplit('.', 1)[-1], nameAndArgs[1:])
+    # A: -> []
+    args = map(lambda a: a.replace('A:', '[]'), args)
+    return nameAndArgs[0] + '(' + ', '.join(args) + ')'
+
+
 
 def dump_as_json(classesDict, varname="XML_DATA"):
     return "var {} = {}".format(varname, (json.dumps(classesDict, indent=4)))
@@ -141,6 +165,12 @@ if __name__ == '__main__':
             classesDict = parse_attr_files()
             print AUTO_GENERATED_WARNING
             print dump_as_json(classesDict, 'CLASS_ATTRIBUTES_DATA')
+        elif sys.argv[1] == 'parse_attr_flat':
+            # creates a list of all methods and fields
+            classesDict = parse_attr_files()
+            attrList = reverse_class_dict(classesDict)
+            print AUTO_GENERATED_WARNING
+            print dump_as_json(attrList, 'ALL_ATTRIBUTES_DATA')
     else:
         jdoc = parse_url_to_classes(JAVASE_8_LINK)
         print AUTO_GENERATED_WARNING

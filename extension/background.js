@@ -15,6 +15,7 @@
 var OMNIBOX_MAX_RESULTS = 20;
 var REFERENCE_JS_URLS = [
   'classes-ref.js',
+  'logic.js',
 ];
 
 
@@ -125,26 +126,11 @@ function onScriptsLoaded() {
 
       suggestFn = suggestFn || function(){};
       query = query.replace(/(^ +)|( +$)/g, '');
-
       var queryPartsLower = query.toLowerCase().match(/[^\s]+/g) || [];
 
       // Filter all classes/packages.
-      var matchedClasses = [];
-
-      for (var i = 0; i < DATA.length; i++) {
-        var currentClass = DATA[i];
-        var textLower = (currentClass.fullname).toLowerCase();
-        for (var j = 0; j < queryPartsLower.length; j++) {
-          if (!queryPartsLower[j]) {
-            continue;
-          }
-
-          if (textLower.indexOf(queryPartsLower[j]) >= 0) {
-            matchedClasses.push(currentClass);
-            break;
-          }
-        }
-      }
+      var searchSpace = DATA;
+      var matchedClasses = matchFullname(queryPartsLower, searchSpace)
 
       // Rank them.
       rankResults(matchedClasses, query);
@@ -179,7 +165,7 @@ function onScriptsLoaded() {
           description = description.replace(queryREs[j], '%|$1|%');
         }
 
-        // // Remove HTML tags from description since omnibox cannot display them.
+        // Remove HTML tags from description since omnibox cannot display them.
         // description = description.replace(/\</g, '&lt;').replace(/\>/g, '&gt;');
 
         // Convert special markers to Omnibox XML
@@ -208,7 +194,6 @@ function onScriptsLoaded() {
     }
   });
 }
-
 
 function navigateToUrl(url) {
   chrome.tabs.getSelected(null, function(tab) {
